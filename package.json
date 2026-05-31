@@ -1,0 +1,51 @@
+{
+  "name": "opencode-skill-hush",
+  "version": "0.1.0",
+  "description": "OpenCode plugin that suppresses verbose skill content and command template display in the TUI",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src/",
+    "CHANGELOG.md",
+    "AGENTS.md"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.15.4",
+    "@opencode-ai/sdk": "^1.15.13"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vitest": "^1.6.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "wolkat",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wolkat/opencode-skill-hush.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wolkat/opencode-skill-hush/issues"
+  },
+  "homepage": "https://github.com/wolkat/opencode-skill-hush#readme",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "skill",
+    "tui",
+    "hush",
+    "suppress"
+  ]
+}
