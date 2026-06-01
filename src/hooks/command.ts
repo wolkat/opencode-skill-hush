@@ -5,15 +5,14 @@ export const createCommandBeforeHandler = (): NonNullable<
   Hooks["command.execute.before"]
 > => {
   return async (input, output) => {
-    output.parts = [
-      {
-        id: "",
-        sessionID: input.sessionID,
-        messageID: "",
-        type: "text",
-        text: `[Command: ${input.command}]`,
-        synthetic: true,
-      } satisfies Part,
-    ]
+    output.parts.length = 0
+    output.parts.push({
+      id: "",
+      sessionID: input.sessionID,
+      messageID: "",
+      type: "text",
+      text: `[Command: ${input.command}]`,
+      synthetic: true,
+    } satisfies Part)
   }
 }
