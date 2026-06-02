@@ -7,6 +7,7 @@ OpenCode plugin that suppresses verbose skill content and command template displ
 - `src/index.ts` -- Plugin entry point, exports `ContentHushPlugin`
 - `src/hooks/skill.ts` -- `tool.execute.after` handler for skill tool
 - `src/hooks/command.ts` -- `command.execute.before` handler for commands
+- `src/hooks/chat.ts` -- `chat.message` handler for command templates arriving via chat
 - `src/hooks/__tests__/` -- Unit tests (vitest)
 
 ## Getting Started

@@ -59,7 +59,7 @@ Clone the repo and reference it directly in `opencode.json`:
 
 ```json
 {
-  "plugin": ["/path/to/opencode-skill-hush/src/index.ts"]
+  "plugin": ["/path/to/opencode-skill-hush/dist/index.js"]
 }
 ```
 
@@ -98,6 +98,7 @@ opencode-skill-hush/
 │   └── hooks/
 │       ├── skill.ts        # tool.execute.after handler
 │       ├── command.ts      # command.execute.before handler
+│       ├── chat.ts         # chat.message handler
 │       └── __tests__/      # Unit tests (vitest)
 ├── package.json
 ├── tsconfig.json
@@ -106,12 +107,13 @@ opencode-skill-hush/
 
 ## How it works
 
-Two hooks, one plugin:
+Three hooks, one plugin:
 
 | Hook | Target | What it does |
 |------|--------|-------------|
 | `tool.execute.after` | `skill` tool | Replaces `output.title` and `output.output` with a minimal placeholder. The tool has already finished, so the LLM context is unaffected. |
 | `command.execute.before` | slash commands | Replaces `output.parts` with a single `[Command: {name}]` text part before it renders. |
+| `chat.message` | TUI chat messages | Detects command templates in chat text parts (H1+H2 >= 50 chars) and replaces them with `[Command: {heading}]`. Catches templates that arrive via `chat.message` rather than `command.execute.before`. |
 
 ## Development
 
