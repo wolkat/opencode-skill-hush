@@ -33,9 +33,10 @@ export const createCommandBeforeHandler = (
     )
     output.parts.length = 0
     output.parts.push({
+      ...(originalTextPart ?? {}),
       id: originalTextPart?.id ?? crypto.randomUUID(),
       sessionID: input.sessionID,
-      messageID: originalTextPart?.messageID ?? "",
+      messageID: originalTextPart?.messageID ?? crypto.randomUUID(),
       type: "text",
       text: `[Command: ${input.command}]`,
       synthetic: true,
