@@ -9,13 +9,17 @@ export type ContentHushOptions = {
   showLineCount?: boolean
 }
 
-export const ContentHushPlugin: Plugin = async (ctx, options) => {
-  const opts: Required<ContentHushOptions> = {
-    suppressSkills: true,
-    suppressCommands: true,
-    showLineCount: false,
-    ...(options as ContentHushOptions ?? {}),
+function parseOptions(raw: Record<string, unknown> | undefined): Required<ContentHushOptions> {
+  const r = raw ?? {}
+  return {
+    suppressSkills: typeof r.suppressSkills === "boolean" ? r.suppressSkills : true,
+    suppressCommands: typeof r.suppressCommands === "boolean" ? r.suppressCommands : true,
+    showLineCount: typeof r.showLineCount === "boolean" ? r.showLineCount : false,
   }
+}
+
+export const ContentHushPlugin: Plugin = async (ctx, options) => {
+  const opts = parseOptions(options as Record<string, unknown> | undefined)
 
   return {
     ...(opts.suppressSkills

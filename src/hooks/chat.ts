@@ -1,5 +1,5 @@
 import type { Hooks, PluginInput } from "@opencode-ai/plugin"
-import type { Part } from "@opencode-ai/sdk"
+import type { TextPart } from "@opencode-ai/sdk"
 
 const MIN_TEMPLATE_LENGTH = 50
 
@@ -8,7 +8,12 @@ function isCommandTemplate(text: string): boolean {
   const firstLine = text.split("\n")[0]
   if (!/^#\s+/.test(firstLine)) return false
   if (!/^##\s/m.test(text)) return false
-  return true
+  // Require either a slash-command prefix or a <skill_content tag to avoid
+  // false positives on user-written markdown with H1+H2 structure.
+  const heading = firstLine.replace(/^#\s+/, "").trim()
+  if (heading.startsWith("/")) return true
+  if (/<skill_content/i.test(text)) return true
+  return false
 }
 
 function extractHeading(text: string): string {
@@ -20,34 +25,35 @@ export const createChatMessageHandler = (
 ): NonNullable<Hooks["chat.message"]> => {
   return async (_input, output) => {
     for (let i = 0; i < output.parts.length; i++) {
-      const part = output.parts[i] as any
+      const part = output.parts[i]
 
-      if (
-        part.type !== "text" ||
-        part.synthetic === true ||
-        typeof part.text !== "string"
-      ) {
-        continue
-      }
+      if (part.type !== "text") continue
+      if (part.synthetic === true || typeof part.text !== "string") continue
 
       if (isCommandTemplate(part.text)) {
-        client?.app?.log({
-          body: {
-            service: "hush",
-            level: "info",
-            message: `chat.message: suppressing command template "${extractHeading(part.text)}" (${part.text.length} chars)`,
-            extra: {
-              heading: extractHeading(part.text),
-              textLength: part.text.length,
+        const heading = extractHeading(part.text)
+
+        if (client) {
+          client.app.log({
+            body: {
+              service: "hush",
+              level: "info",
+              message: `chat.message: suppressing command template "${heading}" (${part.text.length} chars)`,
+              extra: {
+                heading,
+                textLength: part.text.length,
+              },
             },
-          },
-        }).catch(() => {})
+          }).catch((err: unknown) => {
+            console.error("[hush] chat.message log failed:", err)
+          })
+        }
 
         output.parts[i] = {
           ...part,
-          text: `[Command: ${extractHeading(part.text)}]`,
+          text: `[Command: ${heading}]`,
           synthetic: true,
-        } as Part
+        } satisfies TextPart
       }
     }
   }
