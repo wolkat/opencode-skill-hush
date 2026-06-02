@@ -10,9 +10,10 @@ export const createSkillAfterHandler = (
   return async (input, output) => {
     if (input.tool !== "skill") return
 
-    const name = input.args?.name ?? "unknown"
-    const lines = options.showLineCount
-      ? ` (${(output.output ?? "").split("\n").length} lines)`
+    const name = (input.args?.name as string | undefined) || "unknown"
+    const lineCount = output.output ? output.output.split("\n").length : 0
+    const lines = options.showLineCount && lineCount > 0
+      ? ` (${lineCount} lines)`
       : ""
 
     output.title = `skill: ${name}`

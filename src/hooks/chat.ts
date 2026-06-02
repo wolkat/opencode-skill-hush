@@ -7,12 +7,14 @@ function isCommandTemplate(text: string): boolean {
   if (text.length < MIN_TEMPLATE_LENGTH) return false
   const firstLine = text.split("\n")[0]
   if (!/^#\s+/.test(firstLine)) return false
+  // Require <skill_content> tag regardless of H2 presence — skill templates
+  // may lack subsections but should still be suppressed.
+  if (/<skill_content/i.test(text)) return true
   if (!/^##\s/m.test(text)) return false
-  // Require either a slash-command prefix or a <skill_content tag to avoid
-  // false positives on user-written markdown with H1+H2 structure.
+  // Require a slash-command prefix to avoid false positives on user-written
+  // markdown with H1+H2 structure.
   const heading = firstLine.replace(/^#\s+/, "").trim()
   if (heading.startsWith("/")) return true
-  if (/<skill_content/i.test(text)) return true
   return false
 }
 
