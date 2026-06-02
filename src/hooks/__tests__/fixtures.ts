@@ -1,5 +1,6 @@
 import type { Hooks } from "@opencode-ai/plugin"
 import type { Part, TextPart } from "@opencode-ai/sdk"
+import type { PluginInput } from "@opencode-ai/plugin"
 
 // Typed input/output fixtures for hook tests.
 // Using satisfies ensures mismatches surface at test-authoring time,
@@ -86,4 +87,30 @@ export function textPart(text: string, overrides: Partial<TextPart> = {}): TextP
     text,
     ...overrides,
   } satisfies TextPart
+}
+
+// --- Mock client factory ---
+
+type MockClientLogEntry = {
+  service: string
+  level: string
+  message: string
+  extra?: Record<string, unknown>
+}
+
+export type MockClient = PluginInput["client"] & {
+  logs: MockClientLogEntry[]
+}
+
+export function createMockClient(): MockClient {
+  const logs: MockClientLogEntry[] = []
+  return {
+    app: {
+      log: (payload: { body: MockClientLogEntry }) => {
+        logs.push(payload.body)
+        return { catch: () => {} }
+      },
+    },
+    logs,
+  } satisfies MockClient
 }

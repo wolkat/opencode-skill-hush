@@ -55,4 +55,35 @@ describe("createSkillAfterHandler", () => {
     expect(output.title).toBe("skill: unknown")
     expect(output.output).toBe('[Skill "unknown" loaded]')
   })
+
+  it("handles empty string name gracefully", async () => {
+    const handler = createSkillAfterHandler({})
+    const input = makeToolAfterInput({ args: { name: "" } })
+    const output = makeToolAfterOutput()
+
+    await handler(input, output)
+
+    expect(output.title).toBe("skill: unknown")
+    expect(output.output).toBe('[Skill "unknown" loaded]')
+  })
+
+  it("does not show line count for empty output", async () => {
+    const handler = createSkillAfterHandler({ showLineCount: true })
+    const input = makeToolAfterInput({ args: { name: "empty-skill" } })
+    const output = makeToolAfterOutput({ title: "Empty", output: "" })
+
+    await handler(input, output)
+
+    expect(output.output).toBe('[Skill "empty-skill" loaded]')
+  })
+
+  it("does not show line count for undefined output", async () => {
+    const handler = createSkillAfterHandler({ showLineCount: true })
+    const input = makeToolAfterInput({ args: { name: "null-skill" } })
+    const output = makeToolAfterOutput({ title: "Null", output: undefined as unknown as string })
+
+    await handler(input, output)
+
+    expect(output.output).toBe('[Skill "null-skill" loaded]')
+  })
 })

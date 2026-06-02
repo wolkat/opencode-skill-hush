@@ -1,19 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { createChatMessageHandler } from "../chat.js"
-import { makeChatInput, makeChatOutput, textPart } from "./fixtures.js"
-
-function createMockClient() {
-  const logs: Array<{ service: string; level: string; message: string; extra?: Record<string, unknown> }> = []
-  return {
-    app: {
-      log: (payload: { body: { service: string; level: string; message: string; extra?: Record<string, unknown> } }) => {
-        logs.push(payload.body)
-        return { catch: () => {} }
-      },
-    },
-    logs,
-  }
-}
+import { makeChatInput, makeChatOutput, textPart, createMockClient } from "./fixtures.js"
 
 describe("createChatMessageHandler", () => {
   it("suppresses text parts that look like slash-command templates", async () => {
@@ -36,6 +23,21 @@ describe("createChatMessageHandler", () => {
     const output = makeChatOutput([
       textPart(
         '# Save Session Learnings\n\n<skill_content name="save-learnings">\nAnalyze the current session.\n</skill_content>\n\n## What to Extract\n\nSome content here.',
+      ),
+    ])
+
+    await handler(input, output)
+
+    expect(output.parts[0].text).toBe("[Command: Save Session Learnings]")
+    expect(output.parts[0].synthetic).toBe(true)
+  })
+
+  it("suppresses <skill_content> templates without H2 headings", async () => {
+    const handler = createChatMessageHandler()
+    const input = makeChatInput()
+    const output = makeChatOutput([
+      textPart(
+        '# Save Session Learnings\n\n<skill_content name="save-learnings">\nAnalyze the current session and extract learnings.\n</skill_content>',
       ),
     ])
 
@@ -137,7 +139,7 @@ describe("createChatMessageHandler", () => {
 
   it("logs via client when provided", async () => {
     const mockClient = createMockClient()
-    const handler = createChatMessageHandler(mockClient as any)
+    const handler = createChatMessageHandler(mockClient)
     const input = makeChatInput()
     const output = makeChatOutput([
       textPart("# /todo - Scan\n\n## Step 1\n\nScan repos.\n\n## Step 2\n\nReport.", {
