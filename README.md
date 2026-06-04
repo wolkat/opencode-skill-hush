@@ -113,7 +113,7 @@ Three hooks, one plugin:
 |------|--------|-------------|
 | `tool.execute.after` | `skill` tool | Replaces `output.title` and `output.output` with a minimal placeholder. The tool has already finished, so the LLM context is unaffected. |
 | `command.execute.before` | slash commands | Replaces `output.parts` with a single `[Command: {name}]` text part before it renders. |
-| `chat.message` | TUI chat messages | Detects command templates in chat text parts (H1+H2 >= 50 chars) and replaces them with `[Command: {heading}]`. Catches templates that arrive via `chat.message` rather than `command.execute.before`. |
+| `chat.message` | TUI chat messages | Detects command templates in chat text parts and replaces them with `[Command: {heading}]`. Matches if the text contains a `<skill_content>` tag (regardless of H2 structure), or starts with an H1 heading (`#`) that has a `/` prefix and includes H2 sections (`##`). Minimum 50 chars. Catches templates that arrive via `chat.message` rather than `command.execute.before`. |
 
 ## Development
 

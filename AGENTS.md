@@ -29,4 +29,9 @@ npm publish
 
 - `npm run typecheck` -- Run TypeScript type checking
 - `npm test` -- Run vitest unit tests
+- `npm run test:watch` -- Run vitest in watch mode
 - `npm run build` -- Compile TypeScript to `dist/`
+
+## Constraints
+
+- Vitest must stay on `^1.6.1` (not ^4.x) to match the installed version; mismatches break npm imports.
